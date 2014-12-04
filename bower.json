@@ -1,0 +1,16 @@
+{
+	"name": "dust-gallery",
+	"version": "1.0.0",
+	"main": "gallery.plugin.js",
+	"authors" : [
+		{ "name" : "Michael Westwood", "email" : "michael@du.st" }
+	],
+	"repository" : {
+		"type" : "git",
+		"url" : "git://github.com/dustcollective/dust-gallery.git"
+	}
+	"dependencies": {
+		"jQuery": ">=2.1.1"
+	},
+	"private" : true
+}
