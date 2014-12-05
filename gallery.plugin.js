@@ -11,8 +11,8 @@
 			'thumbnailActiveSelector' : '.js-galleryThumbnails li',
 			'thumbnailActiveClass' : 'is-active',
 			'preloadTrigger' : {
-				'element' : 'document',
-				'event' : 'ready'
+				'element' : '.js-galleryThumbnails a',
+				'event' : 'click'
 			},
 			'linkInteractionSeletors' : {
 				'prev' : '.gallery__preview-control--prev',
@@ -27,6 +27,7 @@
 		var previewElem = elem.find(settings.previewContainerSelector);
 		var previewImg = elem.find(settings.previewSelector);
 		var thumbnailElems = elem.find(settings.thumbnailSelector);
+		var loadImageCache = {};
 
 		var currentImageIndex = 0;
 
@@ -35,11 +36,16 @@
 
 			_this.bindActions();
 
-			settings.preloadTrigger = false;
+			settings.preloadTrigger = false; // Disable for now since it's a WIP.
 			if (settings.preloadTrigger) {
 				$(settings.preloadTrigger.element).one(settings.preloadTrigger.event, function() {
-					_this.loadImages();
-					$(this).unbind(settings.preloadTrigger.event);
+
+					var emptyObject = Object.keys(loadImageCache).length;
+
+					if (!emptyObject) {
+						_this.loadImages();
+					}
+
 				});
 			}
 
@@ -117,16 +123,12 @@
 				}
 			}, 20)
 
-			// window.setTimeout(function() { // added timeout for testing.
+			previewImg.one("load", function() {
+				previewElem.removeClass('no-image').removeClass('has-throbber--on');
+				done = true;
+			}).attr("src", href);
 
-			    previewImg.one("load", function() {
-			        previewElem.removeClass('no-image').removeClass('has-throbber--on');
-					done = true;
-			    }).attr("src", href);
-
-				return _this;
-
-			// }, 2000); // added timeout for testing.
+			return _this;
 
 		}
 
@@ -149,19 +151,41 @@
 		}
 
 		/**
+		preloads an image and saves it into a cache.
+		http://awardwinningfjords.com/2011/05/03/jquerydeferred-image-preloader.html
+		**/
+		this.loadImage = function(imageSrc) {
+			if (typeof loadImageCache[imageSrc] === "undefined") {
+				deferred = $.Deferred();
+
+				preloader         = new Image();
+				preloader.onload  = function() { deferred.resolve(this.src) };
+				preloader.onerror = function() { deferred.reject(this.src)  };
+				preloader.src     = imageSrc;
+
+				loadImageCache[imageSrc] = deferred;
+			}
+
+			return loadImageCache[imageSrc];
+		}
+
+		/**
 		loads the full size images of all the thumbnails. Used for preloading
 		to reduce waiting time.
 		**/
 		this.loadImages = function() {
-			$('body').append('<div class="image-preloader"></div>');
+			var _this = this;
+
+			var hrefs = [];
 
 			thumbnailElems.each(function() {
 				var href = $(this).attr('href');
-				$('.image-preloader').load( href );
+				hrefs.push(href);
 			});
 
-			$('.image-preloader').remove();
+			console.log(hrefs);
 
+			return _this;
 		}
 
 		this.prevImage = function() {
