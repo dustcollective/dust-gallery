@@ -1,7 +1,7 @@
 {
 	"name" : "dust-gallery",
 	"version" : "1.0.0",
-	"main" : "gallery.plugin.js",
+	"main" : "./gallery.plugin.js",
 	"authors" : [
 		{
 			"name" : "Michael Westwood",
@@ -14,6 +14,5 @@
 	},
 	"dependencies" : {
 		"jQuery" : ">=2.1.1"
-	},
-	"private" : true
+	}
 }
